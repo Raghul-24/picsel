@@ -1,0 +1,15 @@
+{
+    "app_name": "PicsEl",
+    "welcome" : "Welcome",
+    "enter_your_email": "Enter Your Email",
+    "enter_your_name": "Enter Your Name",
+    "enter_your_password" : "Enter Your Password",
+    "re_enter_your_password": "Re Enter Your Password",
+    "forgot_password": "Forgot Password",
+    "sign_in" : "Sign In",
+    "not_a_member": "Not a Member",
+    "register": "Register",
+    "eraser": "Eraser",
+    "texture": "Texture",
+    "merge": "Merge"
+}

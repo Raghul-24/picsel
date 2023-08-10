@@ -1,0 +1,66 @@
+name: flutter_starter_project
+description: A new Flutter project.
+
+publish_to: 'none' 
+version: 1.0.0+1
+
+environment:
+  sdk: '>=2.18.4 <3.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+
+  #StateManagements
+  hooks_riverpod: ^2.3.6
+
+  #Networks
+  connectivity_plus: ^3.0.6
+
+  #Local Storage
+  flutter_secure_storage: ^8.0.0
+  shared_preferences: ^2.1.0
+
+  #Widgets
+  image_picker: ^0.8.7+4
+
+  #firebase
+  firebase_core:
+  firebase_auth:
+  firebase_ui_auth:
+  cloud_firestore:
+  dartz:
+  images_picker:
+  cached_network_image:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/images/
+    - assets/json/language/
+
+  fonts:
+    - family: EBGaramond-Regular
+      fonts:
+        - asset: fonts/EBGaramond-Regular.ttf
+
+    - family: EBGaramond-Bold
+      fonts:
+        - asset: fonts/EBGaramond-Bold.ttf
+
+    - family: EBGaramond-Medium
+      fonts:
+        - asset: fonts/EBGaramond-Medium.ttf
+
+    - family: Fasthand-Regular
+      fonts:
+        - asset: fonts/Fasthand-Regular.ttf
