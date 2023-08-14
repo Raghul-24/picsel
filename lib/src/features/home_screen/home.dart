@@ -190,25 +190,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               await _keyValueStorageService.getAuthID();
                           var userToken =
                               await _keyValueStorageService.getAuthToken();
-                          debugPrint(userId);
-                          final bodyValue = json.encode({
-                            "images": [
-                              (_homeController.removeBg!.data!.url!.toString())
-                            ]
-                          });
-                          final value =
-                              "https://moonlight-24-default-rtdb.firebaseio.com/$userId.json?auth=$userToken";
-                          debugPrint(value);
-                          final req = await http.post(Uri.parse(value),
-                              body: bodyValue);
-                          if (req.statusCode == 200) {
-                            debugPrint("success");
-                          } else {
-                            debugPrint("failed");
-                          }
                           setState(() {
                             isChoose = false;
                             _homeController.savedImages();
+                            _homeController.sendImages(userId, userToken);
                           });
                         },
                         child: Padding(

@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_starter_project/src/model_classes/edit_image_model/remove_background_image.dart';
 import 'package:flutter_starter_project/src/model_classes/edit_image_model/remove_bg_model/remove_bg_response.dart';
 import 'package:flutter_starter_project/src/model_classes/edit_image_model/saved_images.dart';
+import 'package:flutter_starter_project/src/model_classes/edit_image_model/sendImagesModel.dart';
+import 'package:flutter_starter_project/src/model_classes/edit_image_model/send_images_response.dart';
 import 'package:flutter_starter_project/src/model_classes/edit_image_model/style_transfer.dart';
 import 'package:flutter_starter_project/src/model_classes/edit_image_model/texture_fields.dart';
 import 'package:flutter_starter_project/src/model_classes/error_model/sign_in_error_response.dart';
 import 'package:flutter_starter_project/src/model_classes/user_detail_model/user_detail_response.dart';
+import 'package:flutter_starter_project/src/repository/auth_repository.dart';
 import 'package:flutter_starter_project/src/repository/pics_edit_repository.dart';
 import 'package:flutter_starter_project/src/services/local_storage/key_value_storage_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -26,6 +29,8 @@ class HomeController with ChangeNotifier {
 
   KeyValueStorageService? get keyValueStorageService => _keyValueStorageService;
 
+  final AuthRepository _authRepository = AuthRepository();
+
   SignInErrorResponse? _errorModel;
 
   SignInErrorResponse? get errorModel => _errorModel;
@@ -38,6 +43,7 @@ class HomeController with ChangeNotifier {
 
   PicsArtSuccessResponse? get removeBg => _removeBackgroundResponse;
 
+SendImagesResponse? _sendImagesResponse;
 
   bool _isLoading = false;
 
@@ -103,6 +109,13 @@ class HomeController with ChangeNotifier {
     return _removeBackgroundResponse;
   }
 
+  Future<SendImagesResponse?> sendImages(String? userId, String? userToken) async {
+    var data = SendImagesModel(
+      images: [_removeBackgroundResponse!.data!.url.toString()]
+    );
+    _sendImagesResponse = await _picsEditRepository.sendImages(data: data.toJson());
+    return _sendImagesResponse;
+  }
 
   Future<void>savedImages() async {
     final url = Uri.parse(
@@ -122,7 +135,6 @@ class HomeController with ChangeNotifier {
     images = savedImages;
     notifyListeners();
   }
-
 
   void toggleLoading() {
     _isLoading = !_isLoading;

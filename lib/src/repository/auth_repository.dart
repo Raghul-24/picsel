@@ -20,7 +20,6 @@ class AuthRepository {
         Either<SignInResponse, SignInErrorResponse>>(
         endpoint: ApiEndpoint.auth(AuthEndpoint.LOGIN),
         data: data,
-        // requiresAuthToken: false,
         converter: (response) {
           final code=response[WebserviceConstants.statusCode];
           debugPrint("response mad${response[WebserviceConstants.statusCode]}");
