@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_starter_project/src/common_widgets/src/buttons/outline_button.dart';
 import 'package:flutter_starter_project/src/common_widgets/src/text_field/common_text_field.dart';
 import 'package:flutter_starter_project/src/constants/string_constants.dart';
@@ -11,129 +13,217 @@ import 'package:flutter_starter_project/src/utils/src/colors/common_colors.dart'
 import 'package:flutter_starter_project/src/ui_utils/sized_box.dart';
 import 'package:flutter_starter_project/src/ui_utils/text_styles.dart';
 import 'package:flutter_starter_project/src/utils/utils.dart';
+import 'package:rive/rive.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class LoginForm extends StatefulWidget {
+  LoginForm({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginForm> createState() => _LoginFormState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginFormState extends State<LoginForm> {
+  late String animationURL;
+  Artboard? _teddyArtboard;
+  SMITrigger? successTrigger, failTrigger;
+  SMIBool? isHandsUp, isChecking;
+  SMINumber? numLook;
+
+  StateMachineController? stateMachineController;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
-
-    _signInController = SignInController();
-    _signInController.init(context);
-    _signInController.addListener(() {
-      setState(() {});
-    });
-
-    _signUpController = SignUpController();
-    _signUpController.init(context);
-    _signUpController.addListener(() {
-      setState(() {});
-    });
     super.initState();
+    animationURL = defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS
+        ? 'assets/animations/login.riv'
+        : 'animations/login.riv';
+    rootBundle.load(animationURL).then(
+          (data) {
+        final file = RiveFile.import(data);
+        final artboard = file.mainArtboard;
+        stateMachineController =
+            StateMachineController.fromArtboard(artboard, "Login Machine");
+        if (stateMachineController != null) {
+          artboard.addController(stateMachineController!);
+
+          stateMachineController!.inputs.forEach((e) {
+            debugPrint(e.runtimeType.toString());
+            debugPrint("name${e.name}End");
+          });
+
+          stateMachineController!.inputs.forEach((element) {
+            if (element.name == "trigSuccess") {
+              successTrigger = element as SMITrigger;
+            } else if (element.name == "trigFail") {
+              failTrigger = element as SMITrigger;
+            } else if (element.name == "isHandsUp") {
+              isHandsUp = element as SMIBool;
+            } else if (element.name == "isChecking") {
+              isChecking = element as SMIBool;
+            } else if (element.name == "numLook") {
+              numLook = element as SMINumber;
+            }
+          });
+        }
+
+        setState(() => _teddyArtboard = artboard);
+      },
+    );
   }
 
-  @override
-  void dispose() {
-    _signInController.dispose();
-    _signUpController.dispose();
-    super.dispose();
+  void handsOnTheEyes() {
+    isHandsUp?.change(true);
   }
 
-  bool isLogin = false;
-  bool isSignUp = false;
+  void lookOnTheTextField() {
+    isHandsUp?.change(false);
+    isChecking?.change(true);
+    numLook?.change(0);
+  }
 
-  late SignInController _signInController;
-  late SignUpController _signUpController;
+  void moveEyeBalls(val) {
+    numLook?.change(val.length.toDouble());
+  }
 
+  bool login() {
+    isChecking?.change(false);
+    isHandsUp?.change(false);
+    if (_emailController.text == "admin" &&
+        _passwordController.text == "admin") {
+      successTrigger?.fire();
+      return true;
+    } else {
+      failTrigger?.fire();
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CommonColor.backgroundGrey,
-      body: SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: Utils.getScreenWidth(context, 18),
-                  vertical: Utils.getScreenWidth(context, UIDimens.size15)),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.center,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Text(StringConstants.appName.tr(context),style: TextStyles.titleTextStyle),
-                            const HeightSpaceBox(size: UIDimens.size30),
-                            CommonTextField(
-                                controller:isSignUp? _signUpController.emailController:_signInController.emailController,
-                                hintText:
-                                StringConstants.enterYourEmail.tr(context)),
-                            CommonTextField(
-                              controller:isSignUp?_signUpController.passwordController: _signInController.passwordController,
-                              hintText:
-                              StringConstants.enterYourPassword.tr(context),
+      backgroundColor: const Color(0xffd6e2ea),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (_teddyArtboard != null)
+                SizedBox(
+                  width: 400,
+                  height: 300,
+                  child: Rive(
+                    artboard: _teddyArtboard!,
+                    fit: BoxFit.fitWidth,
+                  ),
+                ),
+              Container(
+                alignment: Alignment.center,
+                width: 400,
+                padding: const EdgeInsets.only(bottom: 15),
+                margin: const EdgeInsets.only(bottom: 15 * 4),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius:
+                  BorderRadius.circular(10),
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 15 * 2),
+                          TextField(
+                            controller: _emailController,
+                            onTap: lookOnTheTextField,
+                            onChanged: moveEyeBalls,
+                            keyboardType: TextInputType.emailAddress,
+                            style: const TextStyle(fontSize: 14),
+                            cursorColor: const Color(0xffb04863),
+                            decoration: const InputDecoration(
+                              hintText: "Email/Username",
+                              filled: true,
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                              focusColor: Color(0xffb04863),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color(0xffb04863),
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
                             ),
-                            const SizedBox(height: UIDimens.size25),
-                            CommonOutlineButton(
-                              text: isSignUp
-                                  ? "Register"
-                                  : StringConstants.signIn.tr(context),
-                              textStyle: TextStyles.whiteTextStyle,
-                              backgroundColor: CommonColor.primaryLightColor,
-                              onPressed: () async {
-                                if(!isSignUp) {
-                                  bool valid = await _signInController.login();
-                                if(valid){
-                                  Navigator.pushNamed(context, RouteConstants.homeScreen);
-                                } else {
-                                  AppSnackBar(message: _signInController.errorModel?.error?.message
-                                  ).showAppSnackBar(context);
-                                  }
-                                } else {
-                                  bool valid = await _signUpController.signUp();
+                          ),
+                          const SizedBox(height: 15),
+                          TextField(
+                            controller: _passwordController,
+                            onTap: handsOnTheEyes,
+                            keyboardType: TextInputType.visiblePassword,
+                            obscureText: true,
+                            style: const TextStyle(fontSize: 14),
+                            cursorColor: const Color(0xffb04863),
+                            decoration: const InputDecoration(
+                              hintText: "Password",
+                              filled: true,
+                              border: OutlineInputBorder(
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                              focusColor: Color(0xffb04863),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color(0xffb04863),
+                                ),
+                                borderRadius:
+                                BorderRadius.all(Radius.circular(10)),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              //remember me checkbox
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: false,
+                                    onChanged: (value) {},
+                                  ),
+                                  const Text("Remember me"),
+                                ],
+                              ),
+                              ElevatedButton(
+                                onPressed: (){
+                                  bool valid=login();
                                   if(valid){
-                                    Navigator.pushNamed(context, RouteConstants.loginScreen);
-                                  } else {
-                                    AppSnackBar(message: _signUpController.errorModel?.error?.message
-                                    ).showAppSnackBar(context);
+                                    Navigator.of(context).pushNamed(RouteConstants.homeScreen);
                                   }
-                                }
-                              },
-                            ),
-                            const HeightSpaceBox(size:UIDimens.size170),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text("${!isSignUp?StringConstants.notAMember.tr(context):"Already Registered"}?",style: TextStyles.greyTextStyle),
-                                const SizedBox(width: UIDimens.size5),
-                                GestureDetector(
-                                    onTap: (){
-                                      setState(() {
-                                        isSignUp = !isSignUp;
-                                      });
-                                    },
-                                    child: Text(!isSignUp?StringConstants.register.tr(context):"SignIn",style: TextStyles.blueTextStyle.copyWith(color: CommonColor.primaryTitleColor))),
-                              ],
-                            ),
-
-                          ],
-                        ),
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xffb04863),
+                                ),
+                                child: const Text("Login"),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  // if(!focusNode!.hasFocus)
-                ],
+                  ],
+                ),
               ),
-            ),
-          )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
