@@ -18,7 +18,7 @@ class RouteManager {
       case RouteConstants.loginScreen:
         return MaterialPageRoute(
             settings: const RouteSettings(name: RouteConstants.loginScreen),
-            builder: (context) =>  LoginForm());
+            builder: (context) =>  LoginScreen());
       case RouteConstants.homeScreen:
         return MaterialPageRoute(
             settings: const RouteSettings(name: RouteConstants.homeScreen),

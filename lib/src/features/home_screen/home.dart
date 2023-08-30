@@ -8,6 +8,7 @@ import 'package:flutter_starter_project/src/common_widgets/src/buttons/outline_b
 import 'package:flutter_starter_project/src/constants/string_constants.dart';
 import 'package:flutter_starter_project/src/controllers/home_controller.dart';
 import 'package:flutter_starter_project/src/features/home_screen/common_edit_icons.dart';
+import 'package:flutter_starter_project/src/features/home_screen/mini_rive.dart';
 import 'package:flutter_starter_project/src/routing/route_constants.dart';
 import 'package:flutter_starter_project/src/services/local_storage/key_value_storage_service.dart';
 import 'package:flutter_starter_project/src/ui_utils/sized_box.dart';
@@ -166,71 +167,84 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: UIDimens.size10),
               child: Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Column(
                   children: [
                     CommonOutlineButton(
                       backgroundColor: CommonColor.primaryTitleColor,
-                      text: !isChoose ? "Add Image to Edit" : "Change Image",
+                      text: "Rive",
                       width: MediaQuery.of(context).size.width / 1.4,
                       onPressed: () async {
-                        Utils().myAlert(context,camera: (){
-                          Navigator.of(context).pop();
-                          getImage(ImageSource.camera, addImage: true);},gallery: (){
-                          Navigator.of(context).pop();
-                          getImage(ImageSource.gallery,
-                              addImage: false);
-                        });
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>const RiveScreen()));
                       },
                     ),
-                    if (isChoose)
-                      GestureDetector(
-                        onTap: () async {
-                          var userId =
-                              await _keyValueStorageService.getAuthID();
-                          var userToken =
-                              await _keyValueStorageService.getAuthToken();
-                          debugPrint(userId);
-                          final bodyValue = json.encode({
-                            "images": [
-                              (_homeController.removeBg!.data!.url!.toString())
-                            ]
-                          });
-                          final value =
-                              "https://moonlight-24-default-rtdb.firebaseio.com/$userId.json?auth=$userToken";
-                          debugPrint(value);
-                          final req = await http.post(Uri.parse(value),
-                              body: bodyValue);
-                          if (req.statusCode == 200) {
-                            debugPrint("success");
-                          } else {
-                            debugPrint("failed");
-                          }
-                          setState(() {
-                            isChoose = false;
-                            _homeController.savedImages();
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: UIDimens.size10),
-                          child: Row(
-                            children: [
-                              Text("Save",
-                                  style: TextStyles.titleTextStyle.copyWith(
-                                      fontSize: UIDimens.size20,
-                                      color: CommonColor.primaryTitleColor)),
-                              const WidthSpaceBox(size: UIDimens.size5),
-                              SizedBox(
-                                height: UIDimens.size20,
-                                child: Image(
-                                  color: CommonColor.primaryTitleColor,
-                                  image: const AssetImage(AppAssets.saveImage),
-                                ),
-                              ),
-                            ],
-                          ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CommonOutlineButton(
+                          backgroundColor: CommonColor.primaryTitleColor,
+                          text: !isChoose ? "Add Image to Edit" : "Change Image",
+                          width: MediaQuery.of(context).size.width / 1.4,
+                          onPressed: () async {
+                            Utils().myAlert(context,camera: (){
+                              Navigator.of(context).pop();
+                              getImage(ImageSource.camera, addImage: true);},gallery: (){
+                              Navigator.of(context).pop();
+                              getImage(ImageSource.gallery,
+                                  addImage: false);
+                            });
+                          },
                         ),
-                      ),
+                        if (isChoose)
+                          GestureDetector(
+                            onTap: () async {
+                              var userId =
+                                  await _keyValueStorageService.getAuthID();
+                              var userToken =
+                                  await _keyValueStorageService.getAuthToken();
+                              debugPrint(userId);
+                              final bodyValue = json.encode({
+                                "images": [
+                                  (_homeController.removeBg!.data!.url!.toString())
+                                ]
+                              });
+                              final value =
+                                  "https://moonlight-24-default-rtdb.firebaseio.com/$userId.json?auth=$userToken";
+                              debugPrint(value);
+                              final req = await http.post(Uri.parse(value),
+                                  body: bodyValue);
+                              if (req.statusCode == 200) {
+                                debugPrint("success");
+                              } else {
+                                debugPrint("failed");
+                              }
+                              setState(() {
+                                isChoose = false;
+                                _homeController.savedImages();
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: UIDimens.size10),
+                              child: Row(
+                                children: [
+                                  Text("Save",
+                                      style: TextStyles.titleTextStyle.copyWith(
+                                          fontSize: UIDimens.size20,
+                                          color: CommonColor.primaryTitleColor)),
+                                  const WidthSpaceBox(size: UIDimens.size5),
+                                  SizedBox(
+                                    height: UIDimens.size20,
+                                    child: Image(
+                                      color: CommonColor.primaryTitleColor,
+                                      image: const AssetImage(AppAssets.saveImage),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
               ),

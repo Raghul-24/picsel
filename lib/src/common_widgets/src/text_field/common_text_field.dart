@@ -3,13 +3,15 @@ import 'package:flutter_starter_project/src/ui_utils/ui_dimens.dart';
 import 'package:flutter_starter_project/src/utils/src/colors/common_colors.dart';
 
 class CommonTextField extends StatefulWidget {
-  const CommonTextField({
+   CommonTextField({
     super.key,
     this.hintText,
+    this.onTap,
     required this.controller,
   });
 
   final String? hintText;
+  VoidCallback? onTap;
   final TextEditingController? controller;
 
   @override
@@ -24,6 +26,7 @@ class _CommonTextFieldState extends State<CommonTextField> {
       child: SizedBox(
         height: UIDimens.size50,
         child: TextFormField(
+          onTap: widget.onTap,
           controller: widget.controller,
           style: TextStyle(color: Colors.grey.shade500),
           decoration: InputDecoration(
